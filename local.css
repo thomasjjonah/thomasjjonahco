@@ -175,6 +175,11 @@ body > .content .section-container p {
   text-align: center;
 }
 
+body > .content .section-container p.description {
+  font-weight: bold;
+  font-size: 15px;
+}
+
 body > .content .section-container .image-container {
   width: 100%;
   height: fit-content;
