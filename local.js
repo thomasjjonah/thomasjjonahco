@@ -134,8 +134,8 @@ function toggleMenu() {
 
 // WINDOW ON LOAD
 window.onload = function() {
-  // monotoneBreather('.loader', 2000);
-  // removeLoader('.loader', 'no-opacity', 9000, 9400);
+  monotoneBreather('.loader', 2000);
+  removeLoader('.loader', 'no-opacity', 9000, 9400);
     // setTimeout(hideSectionContainers, 8900);
   checkImageSize();
   toggleMenu();
