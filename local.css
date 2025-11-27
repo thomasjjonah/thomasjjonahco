@@ -81,6 +81,7 @@ body > .header .menu.section-container .dropdown {
 
 body > .header .menu.section-container .dropdown.show {
   height: 360px;
+  height: auto;
 }
 
 body > .header .menu.section-container .dropdown button {
