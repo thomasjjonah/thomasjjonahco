@@ -37,6 +37,8 @@ function toggleMenu() {
       dropdown_buttons_text = dropdown_buttons.text(),
       home_button = $('.header > .menu .dropdown .home'),
       home_section_container = $('body > .content .section-container.home'),
+      latest_work_button = $('.header > .menu .dropdown .latest-work'),
+      latest_work_section_container = $('body > .content .section-container.latest-work'),
       tableaux_button = $('.header > .menu .dropdown .tableaux'),
       tableaux_section_container = $('body > .content .section-container.tableaux'),
       photo_series_button = $('.header > .menu .dropdown .photo-series'), 
@@ -75,6 +77,11 @@ function toggleMenu() {
       
       if ($(this).hasClass('home')) {
         $('body > .content .section-container.home').addClass('show');
+      }
+      
+      if ($(this).hasClass('latest-work')) {
+        $('body > .content .section-container.latest-work').addClass('show');
+        header_title.addClass('short');
       }
       
       if ($(this).hasClass('tableaux')) {
@@ -127,8 +134,8 @@ function toggleMenu() {
 
 // WINDOW ON LOAD
 window.onload = function() {
-  monotoneBreather('.loader', 2000);
-  removeLoader('.loader', 'no-opacity', 9000, 9400);
+  // monotoneBreather('.loader', 2000);
+  // removeLoader('.loader', 'no-opacity', 9000, 9400);
     // setTimeout(hideSectionContainers, 8900);
   checkImageSize();
   toggleMenu();
