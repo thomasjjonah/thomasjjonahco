@@ -139,6 +139,18 @@ function toggleMenu() {
 
 
 
+// BLOCK RIGHT CLICK
+function blockRightClick() {
+  document.addEventListener('contextmenu', function (e) {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+}
+
+
+
+
 // WINDOW ON LOAD
 window.onload = function() {
   monotoneBreather('.loader', 2000);
@@ -146,4 +158,5 @@ window.onload = function() {
     // setTimeout(hideSectionContainers, 8900);
   checkImageSize();
   toggleMenu();
+  blockRightClick();
 }
