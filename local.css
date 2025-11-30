@@ -245,6 +245,9 @@ body > .content .section-container .image-container p span {
 body > .content .section-container img {
   width: 100%;
   height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .width-longer body > .content .image-container.portrait img {
