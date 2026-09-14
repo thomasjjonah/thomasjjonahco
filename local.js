@@ -1,162 +1,109 @@
-// CHECK IMAGE SIZE
-function checkImageSize() {
-  var content_image = $('body > .content img'),
-      content_image_width = content_image.width(),
-      content_image_height = content_image.height();
-  
-  content_image.each(function() {
-    if ($(this).width() > $(this).height()) {
-      $(this).parent().removeClass('portrait');
-      $(this).parent().addClass('landscape');
-    }
+import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+import { Sky } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/objects/Sky.js";
 
-    if ($(this).height() > $(this).width()) {
-      $(this).parent().removeClass('landscape');
-      $(this).parent().addClass('portrait');
-    }
-  });
+const canvas = document.querySelector("#canvas");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+	60,
+	window.innerWidth / window.innerHeight,
+	0.1,
+	2000
+);
+const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.5;
+
+const sky = new Sky();
+sky.scale.setScalar(10000);
+scene.add(sky);
+
+const skyUniforms = sky.material.uniforms;
+skyUniforms["turbidity"].value = 10;
+skyUniforms["rayleigh"].value = 5;
+skyUniforms["mieCoefficient"].value = 0.005;
+skyUniforms["mieDirectionalG"].value = 0.8;
+
+const sunPosition = new THREE.Vector3();
+const sunLight = new THREE.DirectionalLight(0xffffff, 2);
+scene.add(sunLight);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+scene.add(ambientLight);
+
+const waterGeo = new THREE.PlaneGeometry(500, 500, 150, 150);
+const waterMat = new THREE.MeshStandardMaterial({
+	color: 0x001e0f,
+	roughness: 0.1,
+	metalness: 0.95
+});
+const water = new THREE.Mesh(waterGeo, waterMat);
+
+water.rotation.x = -Math.PI / 2;
+water.position.y = -5;
+scene.add(water);
+
+camera.position.set(0, 5, 50);
+camera.lookAt(0, 0, -100);
+
+let mouseX = 0;
+let mouseY = 0;
+const clock = new THREE.Clock();
+
+function updateSun() {
+	const phi = THREE.MathUtils.degToRad(90 - (mouseY * 20 + 2));
+	const theta = THREE.MathUtils.degToRad(180);
+
+	sunPosition.setFromSphericalCoords(1, phi, theta);
+
+	sky.material.uniforms["sunPosition"].value.copy(sunPosition);
+	sunLight.position.copy(sunPosition).multiplyScalar(100);
+
+	const elevation = 90 - THREE.MathUtils.radToDeg(phi);
+	if (elevation > 5) {
+		renderer.toneMappingExposure = 0.5;
+	} else if (elevation > -5) {
+		renderer.toneMappingExposure = THREE.MathUtils.lerp(
+			0.1,
+			0.5,
+			(elevation + 5) / 10
+		);
+	} else {
+		renderer.toneMappingExposure = 0.1;
+	}
 }
 
+function animate() {
+	requestAnimationFrame(animate);
 
+	const time = clock.getElapsedTime();
+	const positionAttribute = waterGeo.attributes.position;
 
+	for (let i = 0; i < positionAttribute.count; i++) {
+		const u = positionAttribute.getX(i);
+		const v = positionAttribute.getY(i);
+		const z =
+			Math.sin(u * 0.1 + time * 1.5) * 1.2 + Math.cos(v * 0.1 + time * 1.5) * 1.2;
+		positionAttribute.setZ(i, z);
+	}
 
-// HIDE SECTION CONTAINER
-function hideSectionContainers() {
-  $('body > .content .section-container').removeClass('show');
-  $('body > .content .section-container.home').addClass('show');
+	waterGeo.computeVertexNormals();
+	positionAttribute.needsUpdate = true;
+
+	updateSun();
+	renderer.render(scene, camera);
 }
 
+mouseX = 5;
+mouseY = -0.04;
 
+window.addEventListener("resize", () => {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-
-// TOGGLE MENU
-function toggleMenu() {
-  var menu_button = $('.header > .menu > button.menu'),
-      dropdown = $('.header > .menu > .dropdown'),
-      dropdown_buttons = $('.header > .menu > .dropdown button'),
-      dropdown_buttons_text = dropdown_buttons.text(),
-      home_button = $('.header > .menu .dropdown .home'),
-      home_section_container = $('body > .content .section-container.home'),
-      latest_photographs_button = $('.header > .menu .dropdown .latest-photographs'),
-      latest_photographs_section_container = $('body > .content .section-container.latest-photographs'),
-      mixed_reality_button = $('.header > .menu .dropdown .mixed-reality'),
-      mixed_reality_section_container = $('body > .content .section-container.mixed-reality'),
-      tableaux_button = $('.header > .menu .dropdown .tableaux'),
-      tableaux_section_container = $('body > .content .section-container.tableaux'),
-      photo_series_button = $('.header > .menu .dropdown .photo-series'), 
-      photo_series_section_container = $('body > .content .section-container.photo-series'),
-      editorial_button = $('.header > .menu .dropdown .editorial'),
-      editorial_section_container = $('body > .content .section-container.editorial'),
-      snapshots_button = $('.header > .menu .dropdown .snapshots'),
-      snapshots_section_container = $('body > .content .section-container.snapshots'),
-      paintings_button = $('.header > .menu .dropdown .paintings'),
-      paintings_section_container = $('body > .content .section-container.paintings'),
-      design_button = $('.header > .menu .dropdown .design'),
-      design_section_container = $('body > .content .section-container.design'),
-      info_button = $('.header > .menu .dropdown .info'),
-      info_section_container = $('body > .content .section-container.info'),
-      header_title = $('.header > .title'),
-      header_title_text = header_title.text(),
-      content_container = $('body > .content'),
-      content_sections = $('body > .content .section-container'),
-      mail_button = $('body > .content .section-container.info a.mail');
-  
-  
-  menu_button.on('click', function() {
-    menu_button.toggleClass('rotate');
-    dropdown.toggleClass('show');
-    dropdown_buttons.on('click', function() {
-      menu_button.removeClass('rotate');
-      dropdown.removeClass('show');
-      content_sections.removeClass('show');
-      header_title.text($(this).text());
-      content_container.scroll();
-      
-      
-      if (header_title.hasClass('short')) {
-        header_title.removeClass('short');
-      }
-      
-      if ($(this).hasClass('home')) {
-        $('body > .content .section-container.home').addClass('show');
-      }
-      
-      if ($(this).hasClass('latest-photographs')) {
-        $('body > .content .section-container.latest-photographs').addClass('show');
-        header_title.addClass('short');
-      }
-      
-      if ($(this).hasClass('mixed-reality')) {
-        $('body > .content .section-container.mixed-reality').addClass('show');
-        header_title.addClass('short');
-      }
-      
-      if ($(this).hasClass('tableaux')) {
-        $('body > .content .section-container.tableaux').addClass('show');
-        header_title.addClass('short');
-      }
-      
-      if ($(this).hasClass('photo-series')) {
-        $('body > .content .section-container.photo-series').addClass('show');
-      }
-      
-      if ($(this).hasClass('editorial')) {
-        $('body > .content .section-container.editorial').addClass('show');
-      }
-      
-      if ($(this).hasClass('snapshots')) {
-        $('body > .content .section-container.snapshots').addClass('show');
-      }
-      
-      if ($(this).hasClass('paintings')) {
-        $('body > .content .section-container.paintings').addClass('show');
-      }
-      
-      if ($(this).hasClass('design')) {
-        header_title.text("Home");
-        $('body > .content .section-container.home').addClass('show');
-      }
-      
-      if ($(this).hasClass('info')) {
-        $('body > .content .section-container.info').addClass('show');
-      }
-      
-      checkImageSize();
-    })
-    
-    content_container.on('click', function() {
-      menu_button.removeClass('rotate');
-      dropdown.removeClass('show');
-    })
-  })
-  
-  
-  mail_button.on('click', function() {
-     $('body > .content .section-container.info .menu').toggleClass('show');
-  })
-}
-
-
-
-
-// BLOCK RIGHT CLICK
-function blockRightClick() {
-  document.addEventListener('contextmenu', function (e) {
-    if (e.target.tagName === 'IMG') {
-      e.preventDefault();
-    }
-  });
-}
-
-
-
-
-// WINDOW ON LOAD
-window.onload = function() {
-  monotoneBreather('.loader', 2000);
-  removeLoader('.loader', 'no-opacity', 9000, 9400);
-    // setTimeout(hideSectionContainers, 8900);
-  checkImageSize();
-  toggleMenu();
-  blockRightClick();
-}
+updateSun();
+animate();
