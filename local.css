@@ -7,3 +7,11 @@ body {
 canvas {
 	display: block;
 }
+
+header {
+	display: block;
+	position: fixed;
+	text-color: blue;
+	font-size: 30px;
+	margin: auto;
+}
